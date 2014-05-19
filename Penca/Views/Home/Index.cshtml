@@ -1,0 +1,62 @@
+﻿@model Penca.Models.MainModel
+@{
+    ViewBag.Title = "Pronósticos";
+    Model.CanEdit = true;
+    var disabled = Model.CanEdit ? "" : "disabled";
+}
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@ViewBag.Title.</h1>
+                <h2>Para vos que te gusta la timba.</h2>
+            </hgroup>
+        </div>
+    </section>
+}
+
+<article>
+    <hgroup class="title">
+        <h1>Fase de grupos</h1>
+    </hgroup>
+    @foreach (var m in Model.Matches)
+    {
+        <div>
+            <div style="display: inline-block; width: 120px;">
+                <div>@m.MatchDate.ToString("dd MMM HH:mm").ToUpper()</div>
+                <div>GRUPO @m.Group</div>
+            </div>
+            <img height="28" src="~/Content/images/@m.HomeFlag()" title="@m.HomeTeam" />
+            <input type="text" style="width: 20px; vertical-align: top;" value="@m.HomeScore" @disabled />
+            <span style="vertical-align: super;">-</span>
+            <input type="text" style="width: 20px; vertical-align: top;"  value="@m.AwayScore" @disabled />
+            <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
+        </div>
+    }
+    <button id="btnSave" @disabled>GUARDAR</button>
+</article>
+
+<aside>
+    <h3>Aside Title</h3>
+    <p>
+        Use this area to provide additional information.
+    </p>
+</aside>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#btnSave").click(function () {
+                var scores = "";
+                $("input[type='text']").each(function () {
+                    scores += $(this).val() + "|";                    
+                });
+                debugger;
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Save")"+"?data="+scores
+                });
+            });
+        });
+    </script>
+}
