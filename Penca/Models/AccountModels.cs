@@ -26,9 +26,6 @@ namespace Penca.Models
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
         public string UserName { get; set; }
-
-        [NotMapped]
-        public int Score { get; set; }
     }
 
     public class RegisterExternalLoginModel

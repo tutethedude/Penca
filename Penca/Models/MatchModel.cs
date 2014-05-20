@@ -129,6 +129,7 @@ namespace Penca.Models
     public class MainModel
     {
         public IEnumerable<Match> Matches { get; set; }
-        public bool CanEdit { get; set; }
+        public IEnumerable<Result> MyResults { get; set; }
+        public bool FirstRoundEnabled { get; set; }
     }
 }

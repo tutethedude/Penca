@@ -1,8 +1,7 @@
 ﻿@model Penca.Models.MainModel
 @{
     ViewBag.Title = "Pronósticos";
-    Model.CanEdit = true;
-    var disabled = Model.CanEdit ? "" : "disabled";
+    var disabled = Model.FirstRoundEnabled ? "" : "disabled";
 }
 @section featured {
     <section class="featured">
@@ -21,16 +20,18 @@
     </hgroup>
     @foreach (var m in Model.Matches)
     {
+        var result = Model.MyResults.FirstOrDefault(r => r.MatchId == m.MatchId);
         <div>
             <div style="display: inline-block; width: 120px;">
                 <div>@m.MatchDate.ToString("dd MMM HH:mm").ToUpper()</div>
                 <div>GRUPO @m.Group</div>
             </div>
             <img height="28" src="~/Content/images/@m.HomeFlag()" title="@m.HomeTeam" />
-            <input type="text" style="width: 20px; vertical-align: top;" value="@m.HomeScore" @disabled />
+            <input type="text" style="width: 20px; vertical-align: top;" value="@(result != null ? result.HomeScore : 0)" @disabled />
             <span style="vertical-align: super;">-</span>
-            <input type="text" style="width: 20px; vertical-align: top;"  value="@m.AwayScore" @disabled />
+            <input type="text" style="width: 20px; vertical-align: top;"  value="@(result != null ? result.AwayScore : 0)" @disabled />
             <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
+            <span>@m.HomeScore - @m.AwayScore</span>
         </div>
     }
     <button id="btnSave" @disabled>GUARDAR</button>
@@ -49,12 +50,16 @@
             $("#btnSave").click(function () {
                 var scores = "";
                 $("input[type='text']").each(function () {
-                    scores += $(this).val() + "|";                    
+                    scores += $(this).val() + "|";
                 });
                 debugger;
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("Save")"+"?data="+scores
+                    url: "@Url.Action("SaveFirstRound")" + "?data=" + scores,
+                    success: function (data) {
+                        if (data == "OK")
+                            alert("Los cambios se guardaron correctamente");
+                    }
                 });
             });
         });
