@@ -12,16 +12,17 @@ namespace Penca.Controllers
     [InitializeSimpleMembership]
     public class HomeController : Controller
     {
-        private static DateTime FIRST_ROUND_LIMIT = new DateTime(2014, 6, 11);
+        private DateTime FIRST_ROUND_LIMIT = new DateTime(2014, 6, 11);
         public ActionResult Index()
         {
             var model = new MainModel();
             var user = CurrentUser();
-            model.FirstRoundEnabled = DateTime.Now.Date < FIRST_ROUND_LIMIT;
-            using (MatchContext db = new MatchContext())
+            model.FirstRoundEnabled = FirstRoundEnabled();
+            using (var db = new MatchContext())
             {
                 model.Matches = db.Matches.Where(m => m.MatchId <= 48).ToList();
-                model.MyResults = db.Results.Where(r => r.MatchId <= 48 && r.UserId == user.UserId).ToList();
+                var results = db.Results.Where(r => r.MatchId <= 48 && user != null && r.UserId == user.UserId);
+                model.MyResults = results.ToList();
             }
             return View(model);
         }
@@ -29,14 +30,14 @@ namespace Penca.Controllers
         [HttpPost]
         public ActionResult SaveFirstRound(string data)
         {
-            if (User.Identity.IsAuthenticated && DateTime.Now.Date < FIRST_ROUND_LIMIT)
+            if (FirstRoundEnabled())
             {
                 var user = CurrentUser();
                 var array = data.Split('|');
                 if (array.Length == (48 * 2) + 1)
                 {
                     ClearResultsFirstRound(user.UserId);
-                    using (MatchContext db = new MatchContext())
+                    using (var db = new MatchContext())
                     {
                         var matchId = 1;
                         for (int i = 0; i < 48 * 2; i = i + 2)
@@ -55,15 +56,19 @@ namespace Penca.Controllers
 
         private UserProfile CurrentUser()
         {
-            using (UsersContext db = new UsersContext())
+            if (User.Identity.IsAuthenticated)
             {
-                return db.UserProfiles.FirstOrDefault(u => u.UserName == User.Identity.Name);
+                using (var db = new UsersContext())
+                {
+                    return db.UserProfiles.FirstOrDefault(u => u.UserName == User.Identity.Name);
+                }
             }
+            return null;
         }
 
         private void ClearResultsFirstRound(int userId)
         {
-            using (MatchContext db = new MatchContext())
+            using (var db = new MatchContext())
             {
                 foreach (var r in db.Results.Where(r => r.UserId == userId && r.MatchId <= 48))
                     db.Results.Remove(r);
@@ -76,6 +81,11 @@ namespace Penca.Controllers
             var result = 0;
             int.TryParse(score, out result);
             return result;
+        }
+
+        private bool FirstRoundEnabled()
+        {
+            return User.Identity.IsAuthenticated && DateTime.Now.Date < FIRST_ROUND_LIMIT;
         }
     }
 }
