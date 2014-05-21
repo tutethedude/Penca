@@ -13,6 +13,7 @@ namespace Penca.Controllers
     public class HomeController : Controller
     {
         private DateTime FIRST_ROUND_LIMIT = new DateTime(2014, 6, 11);
+
         public ActionResult Index()
         {
             var model = new MainModel();
@@ -21,8 +22,11 @@ namespace Penca.Controllers
             using (var db = new MatchContext())
             {
                 model.Matches = db.Matches.Where(m => m.MatchId <= 48).ToList();
-                var results = db.Results.Where(r => r.MatchId <= 48 && user != null && r.UserId == user.UserId);
-                model.MyResults = results.ToList();
+
+                if (user != null)
+                    model.MyResults = db.Results.Where(r => r.MatchId <= 48 && r.UserId == user.UserId).ToList();
+                else
+                    model.MyResults = new List<Result>();
             }
             return View(model);
         }

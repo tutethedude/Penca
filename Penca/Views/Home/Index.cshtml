@@ -17,6 +17,10 @@
 <article>
     <hgroup class="title">
         <h1>Fase de grupos</h1>
+        @if (!Request.IsAuthenticated)
+        {
+            <h2>Para cargar resultados hay que @Html.ActionLink("registrarse", "Register", "Account") o @Html.ActionLink("iniciar sesión", "Login", "Account"), no seas mamarera!</h2>
+        }
     </hgroup>
     @foreach (var m in Model.Matches)
     {
@@ -47,6 +51,11 @@
 @section Scripts {
     <script type="text/javascript">
         $(document).ready(function () {
+            
+            $("input").change(function () {
+                alert("Los cambios se enviaron correctamente");
+            });
+
             $("#btnSave").click(function () {
                 var scores = "";
                 $("input[type='text']").each(function () {
