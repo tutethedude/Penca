@@ -124,12 +124,46 @@ namespace Penca.Models
         public int UserId { get; set; }
         public int HomeScore { get; set; }
         public int AwayScore { get; set; }
+
+        public int ComputeFirstRoundScore()
+        {
+            if (Match.HomeScore >= 0 && Match.AwayScore >= 0)
+            {
+                if (Match.HomeScore == this.HomeScore && Match.AwayScore == this.AwayScore)
+                    return FIRST_ROUND_EXACT_SCORE;
+                else if (Match.HomeScore > Match.AwayScore && this.HomeScore > this.AwayScore && (Match.HomeScore == this.HomeScore || Match.AwayScore == this.AwayScore))
+                    return FIRST_ROUND_PARTIAL_SCORE;
+                else if (Match.HomeScore == Match.AwayScore && this.HomeScore == this.AwayScore && (Match.HomeScore == this.HomeScore || Match.AwayScore == this.AwayScore))
+                    return FIRST_ROUND_PARTIAL_SCORE;
+                else if (Match.AwayScore > Match.HomeScore && this.AwayScore > this.HomeScore && (Match.HomeScore == this.HomeScore || Match.AwayScore == this.AwayScore))
+                    return FIRST_ROUND_PARTIAL_SCORE;
+                else if (Match.HomeScore > Match.AwayScore && this.HomeScore > this.AwayScore)
+                    return FIRST_ROUND_WINNER_SCORE;
+                else if (Match.HomeScore == Match.AwayScore && this.HomeScore == this.AwayScore)
+                    return FIRST_ROUND_WINNER_SCORE;
+                else if (Match.AwayScore > Match.HomeScore && this.AwayScore > this.HomeScore)
+                    return FIRST_ROUND_WINNER_SCORE;
+            }
+            return 0;
+        }
+
+
+        private const int FIRST_ROUND_EXACT_SCORE = 3;
+        private const int FIRST_ROUND_PARTIAL_SCORE = 2;
+        private const int FIRST_ROUND_WINNER_SCORE = 1;
     }
 
     public class MainModel
     {
         public IEnumerable<Match> Matches { get; set; }
         public IEnumerable<Result> MyResults { get; set; }
+        public IEnumerable<Score> Ranking { get; set; }
         public bool FirstRoundEnabled { get; set; }
+    }
+
+    public class Score
+    {
+        public UserProfile User { get; set; }
+        public int Points { get; set; }
     }
 }

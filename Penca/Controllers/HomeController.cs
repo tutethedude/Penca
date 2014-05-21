@@ -18,16 +18,20 @@ namespace Penca.Controllers
         {
             var model = new MainModel();
             var user = CurrentUser();
-            model.FirstRoundEnabled = FirstRoundEnabled();
+            var matches = new List<Match>();
+            var results = new List<Result>();
             using (var db = new MatchContext())
             {
-                model.Matches = db.Matches.Where(m => m.MatchId <= 48).ToList();
-
-                if (user != null)
-                    model.MyResults = db.Results.Where(r => r.MatchId <= 48 && r.UserId == user.UserId).ToList();
-                else
-                    model.MyResults = new List<Result>();
+                matches = db.Matches.Where(m => m.MatchId <= 48).ToList();
+                results = db.Results.Where(r => r.MatchId <= 48).ToList();
             }
+            model.FirstRoundEnabled = FirstRoundEnabled();
+            model.Matches = matches;
+            if (user != null)
+                model.MyResults = results.Where(r => r.UserId == user.UserId).ToList();
+            else
+                model.MyResults = new List<Result>();
+            model.Ranking = ComputeFirstRoundScores(matches, results);
             return View(model);
         }
 
@@ -91,5 +95,50 @@ namespace Penca.Controllers
         {
             return User.Identity.IsAuthenticated && DateTime.Now.Date < FIRST_ROUND_LIMIT;
         }
+
+        private IEnumerable<Score> ComputeFirstRoundScores(IEnumerable<Match> matches, IEnumerable<Result> results)
+        {
+            var ranking = new List<Score>();
+            var users = new List<UserProfile>();
+            using (var db = new UsersContext())
+            {
+                users = db.UserProfiles.ToList();
+            }
+            foreach (var u in users)
+            {
+                var score = new Score { User = u };
+                var userResults = results.Where(r => r.MatchId <= 48 && r.UserId == u.UserId).ToList();
+                foreach (var r in userResults)
+                {
+                    var match = matches.Where(m => m.MatchId == r.MatchId).FirstOrDefault();
+                    if (r.Match == null)
+                        r.Match = match;
+                    score.Points += r.ComputeFirstRoundScore();
+                    //if (match.HomeScore >= 0 && match.AwayScore >= 0)
+                    //{
+                    //    if (match.HomeScore == r.HomeScore && match.AwayScore == r.AwayScore)
+                    //        score.Points += FIRST_ROUND_EXACT_SCORE;
+                    //    else if (match.HomeScore > match.AwayScore && r.HomeScore > r.AwayScore && (match.HomeScore == r.HomeScore || match.AwayScore == r.AwayScore))
+                    //        score.Points += FIRST_ROUND_PARTIAL_SCORE;
+                    //    else if (match.HomeScore == match.AwayScore && r.HomeScore == r.AwayScore && (match.HomeScore == r.HomeScore || match.AwayScore == r.AwayScore))
+                    //        score.Points += FIRST_ROUND_PARTIAL_SCORE;
+                    //    else if (match.AwayScore > match.HomeScore && r.AwayScore > r.HomeScore && (match.HomeScore == r.HomeScore || match.AwayScore == r.AwayScore))
+                    //        score.Points += FIRST_ROUND_PARTIAL_SCORE;
+                    //    else if (match.HomeScore > match.AwayScore && r.HomeScore > r.AwayScore)
+                    //        score.Points += FIRST_ROUND_WINNER_SCORE;
+                    //    else if (match.HomeScore == match.AwayScore && r.HomeScore == r.AwayScore)
+                    //        score.Points += FIRST_ROUND_WINNER_SCORE;
+                    //    else if (match.AwayScore > match.HomeScore && r.AwayScore > r.HomeScore)
+                    //        score.Points += FIRST_ROUND_WINNER_SCORE;
+                    //}
+                }
+                ranking.Add(score);
+            }
+            return ranking.OrderByDescending(s=>s.Points);
+        }
+
+        private int FIRST_ROUND_EXACT_SCORE = 3;
+        private int FIRST_ROUND_PARTIAL_SCORE = 2;
+        private int FIRST_ROUND_WINNER_SCORE = 1;
     }
 }

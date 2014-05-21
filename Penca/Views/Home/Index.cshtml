@@ -25,43 +25,56 @@
     @foreach (var m in Model.Matches)
     {
         var result = Model.MyResults.FirstOrDefault(r => r.MatchId == m.MatchId);
-        <div>
-            <div style="display: inline-block; width: 120px;">
+        <div class="penca-row">
+            <div class="penca-row-date">
                 <div>@m.MatchDate.ToString("dd MMM HH:mm").ToUpper()</div>
                 <div>GRUPO @m.Group</div>
             </div>
             <img height="28" src="~/Content/images/@m.HomeFlag()" title="@m.HomeTeam" />
-            <input type="text" style="width: 20px; vertical-align: top;" value="@(result != null ? result.HomeScore : 0)" @disabled />
-            <span style="vertical-align: super;">-</span>
-            <input type="text" style="width: 20px; vertical-align: top;"  value="@(result != null ? result.AwayScore : 0)" @disabled />
+            <input type="text"  value="@(result != null ? result.HomeScore : 0)" @disabled />
+            <span>-</span>
+            <input type="text"   value="@(result != null ? result.AwayScore : 0)" @disabled />
             <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
-            <span>@m.HomeScore - @m.AwayScore</span>
+            <span>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</span>
         </div>
     }
     <button id="btnSave" @disabled>GUARDAR</button>
 </article>
 
 <aside>
-    <h3>Aside Title</h3>
-    <p>
-        Use this area to provide additional information.
-    </p>
+    <h3>Ranking</h3>
+    <table>
+        @{var pos = 1;}
+        @foreach (var s in Model.Ranking)
+        {
+            <tr>
+                <td>@(pos)º
+                </td>
+                <td>@s.User.UserName
+                </td>
+                <td>@s.Points
+                </td>
+            </tr>
+            pos++;
+        }
+    </table>
+
+    <h3>Fase de grupos</h3>
+    <ul>
+        <li>Acierto por ganador o empate: 1 punto</li>
+        <li>Acierto por ganador y cantidad de goles de uno de los equipos: 2 puntos</li>
+        <li>Acierto por resultado exacto: 3 puntos</li>
+    </ul>
 </aside>
 
 @section Scripts {
     <script type="text/javascript">
         $(document).ready(function () {
-            
-            $("input").change(function () {
-                alert("Los cambios se enviaron correctamente");
-            });
-
             $("#btnSave").click(function () {
                 var scores = "";
                 $("input[type='text']").each(function () {
                     scores += $(this).val() + "|";
                 });
-                debugger;
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("SaveFirstRound")" + "?data=" + scores,
