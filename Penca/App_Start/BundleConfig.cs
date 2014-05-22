@@ -22,6 +22,10 @@ namespace Penca
             // preparado para la producción y podrá utilizar la herramienta de creación disponible en http://modernizr.com para seleccionar solo las pruebas que necesite.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
+            
+            bundles.Add(new ScriptBundle("~/bundles/highcharts").Include(
+                        "~/Scripts/highcharts.js",
+                        "~/Scripts/themes/gray.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include("~/Content/site.css"));
 

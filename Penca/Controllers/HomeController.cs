@@ -104,41 +104,44 @@ namespace Penca.Controllers
             {
                 users = db.UserProfiles.ToList();
             }
+
             foreach (var u in users)
             {
-                var score = new Score { User = u };
-                var userResults = results.Where(r => r.MatchId <= 48 && r.UserId == u.UserId).ToList();
-                foreach (var r in userResults)
+                var score = new Score { User = u, ScoreByDate = new List<int>(), AccumScoreByDate = new List<int>() };
+                var lastMatch = matches.Where(m => m.HomeScore >= 0).OrderBy(m => m.MatchId).LastOrDefault();
+                if (lastMatch != null)
                 {
-                    var match = matches.Where(m => m.MatchId == r.MatchId).FirstOrDefault();
-                    if (r.Match == null)
+                    var scoreDic = new SortedDictionary<DateTime, int>();
+                    var accumScoreDic = new SortedDictionary<DateTime, int>();
+                    var userResults = results.Where(r => r.MatchId <= lastMatch.MatchId && r.UserId == u.UserId).ToList();
+                    foreach (var r in userResults)
+                    {
+                        var match = matches.Where(m => m.MatchId == r.MatchId).FirstOrDefault();
                         r.Match = match;
-                    score.Points += r.ComputeFirstRoundScore();
-                    //if (match.HomeScore >= 0 && match.AwayScore >= 0)
-                    //{
-                    //    if (match.HomeScore == r.HomeScore && match.AwayScore == r.AwayScore)
-                    //        score.Points += FIRST_ROUND_EXACT_SCORE;
-                    //    else if (match.HomeScore > match.AwayScore && r.HomeScore > r.AwayScore && (match.HomeScore == r.HomeScore || match.AwayScore == r.AwayScore))
-                    //        score.Points += FIRST_ROUND_PARTIAL_SCORE;
-                    //    else if (match.HomeScore == match.AwayScore && r.HomeScore == r.AwayScore && (match.HomeScore == r.HomeScore || match.AwayScore == r.AwayScore))
-                    //        score.Points += FIRST_ROUND_PARTIAL_SCORE;
-                    //    else if (match.AwayScore > match.HomeScore && r.AwayScore > r.HomeScore && (match.HomeScore == r.HomeScore || match.AwayScore == r.AwayScore))
-                    //        score.Points += FIRST_ROUND_PARTIAL_SCORE;
-                    //    else if (match.HomeScore > match.AwayScore && r.HomeScore > r.AwayScore)
-                    //        score.Points += FIRST_ROUND_WINNER_SCORE;
-                    //    else if (match.HomeScore == match.AwayScore && r.HomeScore == r.AwayScore)
-                    //        score.Points += FIRST_ROUND_WINNER_SCORE;
-                    //    else if (match.AwayScore > match.HomeScore && r.AwayScore > r.HomeScore)
-                    //        score.Points += FIRST_ROUND_WINNER_SCORE;
-                    //}
+                        var points = r.ComputeFirstRoundScore();
+                        score.Points += points;
+
+                        if (scoreDic.ContainsKey(match.MatchDate.Date))
+                            scoreDic[match.MatchDate.Date] += points;
+                        else
+                            scoreDic[match.MatchDate.Date] = points;
+
+                        //if (accumScoreDic.ContainsKey(match.MatchDate.Date))
+                        //    accumScoreDic[match.MatchDate.Date] += score.Points;
+                        //else
+                            accumScoreDic[match.MatchDate.Date] = score.Points;
+
+                    }
+                    foreach (var k in scoreDic.Keys)
+                    {
+                        score.ScoreByDate.Add(scoreDic[k]);
+                        score.AccumScoreByDate.Add(accumScoreDic[k]);
+                    }
                 }
                 ranking.Add(score);
             }
-            return ranking.OrderByDescending(s=>s.Points);
+            return ranking.OrderByDescending(s => s.Points);
         }
 
-        private int FIRST_ROUND_EXACT_SCORE = 3;
-        private int FIRST_ROUND_PARTIAL_SCORE = 2;
-        private int FIRST_ROUND_WINNER_SCORE = 1;
     }
 }

@@ -15,7 +15,7 @@ namespace Penca.Migrations
 
         protected override void Seed(Penca.Models.MatchContext context)
         {
-
+            /*
             foreach (var m in context.Matches)
                 context.Matches.Remove(m);
 
@@ -81,11 +81,7 @@ namespace Penca.Migrations
             context.Matches.Add(new Match { MatchId = 46, MatchDate = new DateTime(2014, 6, 26, 13, 0, 0), Group = "F", MatchStadium = "Recife", HomeTeam = "EEUU", AwayTeam = "Alemania" , HomeScore = -1, AwayScore = -1 });
             context.Matches.Add(new Match { MatchId = 47, MatchDate = new DateTime(2014, 6, 26, 17, 0, 0), Group = "E", MatchStadium = "São Paulo", HomeTeam = "República de Corea", AwayTeam = "Bélgica" , HomeScore = -1, AwayScore = -1 });
             context.Matches.Add(new Match { MatchId = 48, MatchDate = new DateTime(2014, 6, 26, 17, 0, 0), Group = "E", MatchStadium = "Curitiba", HomeTeam = "Argelia", AwayTeam = "Rusia" , HomeScore = -1, AwayScore = -1 });
-
-            /*
-                                    Argelia Camerún Costa de Marfil Ghana Nigeria Australia Irán Japón República de Corea Alemania Bélgica Bosnia y Herzegovina
-                                    Croacia España Francia Grecia Inglaterra Italia Países Bajos Portugal Rusia Suiza Costa Rica EEUU Honduras México
-                                    Argentina Brasil Chile Colombia Ecuador Uruguay
+            
              */
         }
     }

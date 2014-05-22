@@ -10,17 +10,31 @@
                 <h1>@ViewBag.Title.</h1>
                 <h2>Para vos que te gusta la timba.</h2>
             </hgroup>
+            @if (!Request.IsAuthenticated)
+            {
+                <hgroup class="title">
+                    <h2>Para cargar resultados hay que @Html.ActionLink("registrarse", "Register", "Account") o @Html.ActionLink("iniciar sesión", "Login", "Account"), no seas mamarera!</h2>
+                </hgroup>
+            }
         </div>
     </section>
 }
-
 <article>
+    @if (Model.DateCount >= 2)
+    {
+        <hgroup class="title">
+            <h1>Ranking fecha a fecha</h1>
+        </hgroup>
+        <div id="chartAcc">
+        </div>
+        <hgroup class="title">
+            <h1>Puntos de cada fecha</h1>
+        </hgroup>
+        <div id="chart">
+        </div>
+    }
     <hgroup class="title">
-        <h1>Fase de grupos</h1>
-        @if (!Request.IsAuthenticated)
-        {
-            <h2>Para cargar resultados hay que @Html.ActionLink("registrarse", "Register", "Account") o @Html.ActionLink("iniciar sesión", "Login", "Account"), no seas mamarera!</h2>
-        }
+        <h1>Pronóstico fase de grupos</h1>
     </hgroup>
     @foreach (var m in Model.Matches)
     {
@@ -36,13 +50,13 @@
             <input type="text"   value="@(result != null ? result.AwayScore : 0)" @disabled />
             <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
             <span>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</span>
+            <span>@(result != null ? result.ComputeFirstRoundScore()+" pts." : "")</span>
         </div>
     }
     <button id="btnSave" @disabled>GUARDAR</button>
 </article>
-
 <aside>
-    <h3>Ranking</h3>
+    <h3>Ranking general</h3>
     <table>
         @{var pos = 1;}
         @foreach (var s in Model.Ranking)
@@ -52,13 +66,12 @@
                 </td>
                 <td>@s.User.UserName
                 </td>
-                <td>@s.Points
+                <td>@s.Points pts
                 </td>
             </tr>
             pos++;
         }
     </table>
-
     <h3>Fase de grupos</h3>
     <ul>
         <li>Acierto por ganador o empate: 1 punto</li>
@@ -79,11 +92,91 @@
                     type: "POST",
                     url: "@Url.Action("SaveFirstRound")" + "?data=" + scores,
                     success: function (data) {
-                        if (data == "OK")
+                        if (data == "OK") {
                             alert("Los cambios se guardaron correctamente");
+                            location.reload();
+                        }
                     }
                 });
             });
+
+
         });
     </script>
+
+    @if (Model.DateCount >= 2)
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var chartOpt = {
+                    chart: {
+                        type: 'spline'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        title: {
+                            text: ''
+                        },
+                        categories: [@Html.Raw(Model.CategoriesJS)]
+                     },
+                     yAxis: {
+                         title: {
+                             text: ''
+                         },
+                         min: 0
+                     },
+                     legend: {
+                         align: 'right',
+                         verticalAlign: 'middle',
+                         layout: 'vertical',
+                         floating: false
+                     },
+                     series: []
+                 };
+
+            @foreach (var s in Model.Ranking)
+            {
+                <text>chartOpt.series.push({ name: '@s.User.UserName', data: [@s.ScoreByDateJS] });</text>
+            }
+
+                 $('#chart').highcharts(chartOpt);
+
+                 var chartOptAcc = {
+                     chart: {
+                         type: 'spline'
+                     },
+                     title: {
+                         text: ''
+                     },
+                     xAxis: {
+                         title: {
+                             text: ''
+                         },
+                         categories: [@Html.Raw(Model.CategoriesJS)]
+                     },
+                     yAxis: {
+                         title: {
+                             text: ''
+                         }
+                     },
+                     legend: {
+                         align: 'right',
+                         verticalAlign: 'middle',
+                         layout: 'vertical',
+                         floating: false
+                     },
+                     series: []
+                 };
+
+            @foreach (var s in Model.Ranking)
+            {
+                <text>chartOptAcc.series.push({ name: '@s.User.UserName', data: [@s.AccumScoreByDateJS] });</text>
+            }
+
+                 $('#chartAcc').highcharts(chartOptAcc);
+             });
+        </script>
+    }
 }

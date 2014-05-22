@@ -38,7 +38,7 @@ namespace Penca.Models
 
         public string HomeFlag() { return Flag(HomeTeam); }
         public string AwayFlag() { return Flag(AwayTeam); }
-        
+
         private string Flag(string country)
         {
             switch (country)
@@ -110,6 +110,7 @@ namespace Penca.Models
             }
             return "galera.png";
         }
+
     }
 
     [Table("Result")]
@@ -159,11 +160,58 @@ namespace Penca.Models
         public IEnumerable<Result> MyResults { get; set; }
         public IEnumerable<Score> Ranking { get; set; }
         public bool FirstRoundEnabled { get; set; }
+
+        public string CategoriesJS
+        {
+            get
+            {
+                var js = "";
+                for (var i = 1; i <= DateCount; i++)
+                {
+                    js += "'" + i + "',";
+                }
+
+                return js.Length > 0 ? js.Remove(js.Length - 1) : js;
+            }
+        }
+
+        public int DateCount
+        {
+            get { return Ranking.FirstOrDefault().ScoreByDate.Count; }
+        }
     }
 
     public class Score
     {
         public UserProfile User { get; set; }
         public int Points { get; set; }
+        public List<int> ScoreByDate { get; set; }
+        public List<int> AccumScoreByDate { get; set; }
+
+        public string ScoreByDateJS
+        {
+            get
+            {
+                var js = "";
+                foreach (var s in ScoreByDate)
+                {
+                    js += s + ",";
+                }
+                return js.Length > 0 ? js.Remove(js.Length - 1) : js;
+            }
+        }
+
+        public string AccumScoreByDateJS
+        {
+            get
+            {
+                var js = "";
+                foreach (var s in AccumScoreByDate)
+                {
+                    js += s + ",";
+                }
+                return js.Length > 0 ? js.Remove(js.Length - 1) : js;
+            }
+        }
     }
 }
