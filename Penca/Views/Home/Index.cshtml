@@ -39,7 +39,7 @@
     {    
         <hgroup class="title">
             <h1>Pronóstico fase de grupos</h1>
-            <h2>@Html.ActionLink("Ver por fecha", "Index", "Home", new { orderBy = "date" })</h2>
+            <h2>@Html.ActionLink("Ver por fecha", "Index", "Home", new { orderBy = "date" }, null)</h2>
         </hgroup>
         foreach (var g in Model.MatchesByGroup)
         {
@@ -83,7 +83,7 @@
         
         <hgroup class="title">
             <h1>Pronóstico fase de grupos</h1>
-            <h2>@Html.ActionLink("Ver por grupos", "Index", "Home", new { orderBy = "group" })</h2>
+            <h2>@Html.ActionLink("Ver por grupos", "Index", "Home", new { orderBy = "group" }, null)</h2>
         </hgroup>
         foreach (var g in Model.MatchesByDate)
         {
