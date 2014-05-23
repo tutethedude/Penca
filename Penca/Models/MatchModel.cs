@@ -167,6 +167,7 @@ namespace Penca.Models
         public IEnumerable<Score> Ranking { get; set; }
         public IEnumerable<UserProfile> Users { get; set; }
         public bool FirstRoundEnabled { get; set; }
+        public string OrderBy { get; set; }
 
         public string CategoriesJS
         {
@@ -185,6 +186,22 @@ namespace Penca.Models
         public int DateCount
         {
             get { return Ranking.FirstOrDefault().ScoreByDate.Count; }
+        }
+
+        public IEnumerable<IGrouping<DateTime, Match>> MatchesByDate
+        {
+            get
+            {
+                return Matches.GroupBy(m => m.MatchDate.Date);
+            }
+        }
+
+        public IEnumerable<IGrouping<string, Match>> MatchesByGroup
+        {
+            get
+            {
+                return Matches.GroupBy(m => m.Group);
+            }
         }
     }
 

@@ -77,10 +77,10 @@ namespace Penca.Migrations
             context.Matches.Add(new Match { MatchId = 43, MatchDate = new DateTime(2014, 6, 25, 17, 0, 0), Group = "E", MatchStadium = "Manaos", HomeTeam = "Honduras", AwayTeam = "Suiza" , HomeScore = -1, AwayScore = -1 });
             context.Matches.Add(new Match { MatchId = 44, MatchDate = new DateTime(2014, 6, 25, 17, 0, 0), Group = "E", MatchStadium = "Río de Janeiro", HomeTeam = "Ecuador", AwayTeam = "Francia" , HomeScore = -1, AwayScore = -1 });
 
-            context.Matches.Add(new Match { MatchId = 45, MatchDate = new DateTime(2014, 6, 26, 13, 0, 0), Group = "F", MatchStadium = "Brasilia", HomeTeam = "Portugal", AwayTeam = "Ghana" , HomeScore = -1, AwayScore = -1 });
-            context.Matches.Add(new Match { MatchId = 46, MatchDate = new DateTime(2014, 6, 26, 13, 0, 0), Group = "F", MatchStadium = "Recife", HomeTeam = "EEUU", AwayTeam = "Alemania" , HomeScore = -1, AwayScore = -1 });
-            context.Matches.Add(new Match { MatchId = 47, MatchDate = new DateTime(2014, 6, 26, 17, 0, 0), Group = "E", MatchStadium = "São Paulo", HomeTeam = "República de Corea", AwayTeam = "Bélgica" , HomeScore = -1, AwayScore = -1 });
-            context.Matches.Add(new Match { MatchId = 48, MatchDate = new DateTime(2014, 6, 26, 17, 0, 0), Group = "E", MatchStadium = "Curitiba", HomeTeam = "Argelia", AwayTeam = "Rusia" , HomeScore = -1, AwayScore = -1 });
+            context.Matches.Add(new Match { MatchId = 45, MatchDate = new DateTime(2014, 6, 26, 13, 0, 0), Group = "G", MatchStadium = "Brasilia", HomeTeam = "Portugal", AwayTeam = "Ghana" , HomeScore = -1, AwayScore = -1 });
+            context.Matches.Add(new Match { MatchId = 46, MatchDate = new DateTime(2014, 6, 26, 13, 0, 0), Group = "G", MatchStadium = "Recife", HomeTeam = "EEUU", AwayTeam = "Alemania" , HomeScore = -1, AwayScore = -1 });
+            context.Matches.Add(new Match { MatchId = 47, MatchDate = new DateTime(2014, 6, 26, 17, 0, 0), Group = "H", MatchStadium = "São Paulo", HomeTeam = "República de Corea", AwayTeam = "Bélgica" , HomeScore = -1, AwayScore = -1 });
+            context.Matches.Add(new Match { MatchId = 48, MatchDate = new DateTime(2014, 6, 26, 17, 0, 0), Group = "H", MatchStadium = "Curitiba", HomeTeam = "Argelia", AwayTeam = "Rusia" , HomeScore = -1, AwayScore = -1 });
             
              */
         }

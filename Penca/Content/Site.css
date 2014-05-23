@@ -625,6 +625,11 @@ tr.pager td {
     text-align: center;
 }
 
+#chart, #chartAcc {
+    height: 300px;
+}
+
+
 /********************
 *   Mobile Styles   *
 ********************/

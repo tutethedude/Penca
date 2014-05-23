@@ -14,9 +14,10 @@ namespace Penca.Controllers
     {
         private DateTime FIRST_ROUND_LIMIT = new DateTime(2014, 6, 11);
 
-        public ActionResult Index()
+        public ActionResult Index(string orderBy)
         {
-            var model = new MainModel();
+            orderBy = orderBy == "date" ? "date" : "group";
+            var model = new MainModel { OrderBy = orderBy };
             var user = CurrentUser();
             var matches = new List<Match>();
             var results = new List<Result>();

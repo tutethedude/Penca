@@ -23,6 +23,8 @@ namespace Penca
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             AuthConfig.RegisterAuth();
+
+            ViewEngines.Engines.Add(new RazorViewEngine());
         }
     }
 }
