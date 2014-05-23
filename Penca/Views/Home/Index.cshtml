@@ -39,18 +39,30 @@
     @foreach (var m in Model.Matches)
     {
         var result = Model.MyResults.FirstOrDefault(r => r.MatchId == m.MatchId);
+        var otherResults = Model.OtherResults.Where(r => r.MatchId == m.MatchId).OrderBy(r => r.UserId);
         <div class="penca-row">
             <div class="penca-row-date">
                 <div>@m.MatchDate.ToString("dd MMM HH:mm").ToUpper()</div>
-                <div>GRUPO @m.Group</div>
+                <div><strong>GRUPO @m.Group</strong></div>
             </div>
             <img height="28" src="~/Content/images/@m.HomeFlag()" title="@m.HomeTeam" />
             <input type="text"  value="@(result != null ? result.HomeScore : 0)" @disabled />
-            <span>-</span>
+            <span>&nbsp;</span>
             <input type="text"   value="@(result != null ? result.AwayScore : 0)" @disabled />
             <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
-            <span>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</span>
-            <span>@(result != null ? result.ComputeFirstRoundScore()+" pts." : "")</span>
+            <div class="penca-row-final">
+                <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
+                <div><strong>@(result != null ? result.ComputeFirstRoundScore() + " pts." : "")</strong></div>
+            </div>
+            <div class="penca-row-result-wrapper">
+                @foreach (var r in otherResults)
+                {
+                    <div class="penca-row-result">
+                        <div>@r.UserName(Model.Users)</div>
+                        <div>@r.HomeScore - @r.AwayScore</div>
+                    </div>
+                }
+            </div>
         </div>
     }
     <button id="btnSave" @disabled>GUARDAR</button>
@@ -99,8 +111,6 @@
                     }
                 });
             });
-
-
         });
     </script>
 
@@ -120,63 +130,63 @@
                             text: ''
                         },
                         categories: [@Html.Raw(Model.CategoriesJS)]
-                     },
-                     yAxis: {
-                         title: {
-                             text: ''
-                         },
-                         min: 0
-                     },
-                     legend: {
-                         align: 'right',
-                         verticalAlign: 'middle',
-                         layout: 'vertical',
-                         floating: false
-                     },
-                     series: []
-                 };
+                    },
+                    yAxis: {
+                        title: {
+                            text: ''
+                        },
+                        min: 0
+                    },
+                    legend: {
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        layout: 'vertical',
+                        floating: false
+                    },
+                    series: []
+                };
 
             @foreach (var s in Model.Ranking)
             {
                 <text>chartOpt.series.push({ name: '@s.User.UserName', data: [@s.ScoreByDateJS] });</text>
             }
 
-                 $('#chart').highcharts(chartOpt);
+                $('#chart').highcharts(chartOpt);
 
-                 var chartOptAcc = {
-                     chart: {
-                         type: 'spline'
-                     },
-                     title: {
-                         text: ''
-                     },
-                     xAxis: {
-                         title: {
-                             text: ''
-                         },
-                         categories: [@Html.Raw(Model.CategoriesJS)]
-                     },
-                     yAxis: {
-                         title: {
-                             text: ''
-                         }
-                     },
-                     legend: {
-                         align: 'right',
-                         verticalAlign: 'middle',
-                         layout: 'vertical',
-                         floating: false
-                     },
-                     series: []
-                 };
+                var chartOptAcc = {
+                    chart: {
+                        type: 'spline'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        title: {
+                            text: ''
+                        },
+                        categories: [@Html.Raw(Model.CategoriesJS)]
+                    },
+                    yAxis: {
+                        title: {
+                            text: ''
+                        }
+                    },
+                    legend: {
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        layout: 'vertical',
+                        floating: false
+                    },
+                    series: []
+                };
 
             @foreach (var s in Model.Ranking)
             {
                 <text>chartOptAcc.series.push({ name: '@s.User.UserName', data: [@s.AccumScoreByDateJS] });</text>
             }
 
-                 $('#chartAcc').highcharts(chartOptAcc);
-             });
+                $('#chartAcc').highcharts(chartOptAcc);
+            });
         </script>
     }
 }

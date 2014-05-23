@@ -606,6 +606,25 @@ tr.pager td {
     vertical-align: super;
 }
 
+.penca-row .penca-row-final {
+    display: inline-block;
+    width: 80px;
+    text-align: center;
+    margin-left: 10px;
+    margin-right: 20px;
+}
+
+.penca-row .penca-row-result-wrapper {
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.penca-row .penca-row-result {
+    display: inline-block;
+    width: 55px;
+    text-align: center;
+}
+
 /********************
 *   Mobile Styles   *
 ********************/

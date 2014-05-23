@@ -126,6 +126,11 @@ namespace Penca.Models
         public int HomeScore { get; set; }
         public int AwayScore { get; set; }
 
+        public string UserName(IEnumerable<UserProfile> users)
+        {
+            return users.FirstOrDefault(u => u.UserId == UserId).UserName;
+        }
+
         public int ComputeFirstRoundScore()
         {
             if (Match.HomeScore >= 0 && Match.AwayScore >= 0)
@@ -158,7 +163,9 @@ namespace Penca.Models
     {
         public IEnumerable<Match> Matches { get; set; }
         public IEnumerable<Result> MyResults { get; set; }
+        public IEnumerable<Result> OtherResults { get; set; }
         public IEnumerable<Score> Ranking { get; set; }
+        public IEnumerable<UserProfile> Users { get; set; }
         public bool FirstRoundEnabled { get; set; }
 
         public string CategoriesJS

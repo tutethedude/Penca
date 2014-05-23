@@ -20,6 +20,10 @@ namespace Penca.Controllers
             var user = CurrentUser();
             var matches = new List<Match>();
             var results = new List<Result>();
+            using (var db = new UsersContext())
+            {
+                model.Users = db.UserProfiles.ToList();
+            }
             using (var db = new MatchContext())
             {
                 matches = db.Matches.Where(m => m.MatchId <= 48).ToList();
@@ -28,9 +32,15 @@ namespace Penca.Controllers
             model.FirstRoundEnabled = FirstRoundEnabled();
             model.Matches = matches;
             if (user != null)
+            {
                 model.MyResults = results.Where(r => r.UserId == user.UserId).ToList();
+                model.OtherResults = results.Where(r => r.UserId != user.UserId).ToList();
+            }
             else
+            {
                 model.MyResults = new List<Result>();
+                model.OtherResults = results.ToList();
+            }
             model.Ranking = ComputeFirstRoundScores(matches, results);
             return View(model);
         }
