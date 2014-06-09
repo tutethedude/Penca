@@ -54,9 +54,9 @@
                 @*<div><strong>GRUPO @m.Group</strong></div>*@
             </div>
             <img height="28" src="~/Content/images/@m.HomeFlag()" title="@m.HomeTeam" />
-            <input type="text"  value="@(result != null ? result.HomeScore : 0)" @disabled />
+            <input type="text"  data-id="@m.MatchId" value="@(result != null ? result.HomeScore : 0)" @disabled />
             <span>&nbsp;</span>
-            <input type="text"   value="@(result != null ? result.AwayScore : 0)" @disabled />
+            <input type="text"  data-id="@m.MatchId"  value="@(result != null ? result.AwayScore : 0)" @disabled />
             <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
             <div class="penca-row-final">
                 <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
@@ -98,9 +98,9 @@
                 <div><strong>GRUPO @m.Group</strong></div>
             </div>
             <img height="28" src="~/Content/images/@m.HomeFlag()" title="@m.HomeTeam" />
-            <input type="text"  value="@(result != null ? result.HomeScore : 0)" @disabled />
+            <input type="text" data-id="@m.MatchId"  value="@(result != null ? result.HomeScore : 0)" @disabled />
             <span>&nbsp;</span>
-            <input type="text"   value="@(result != null ? result.AwayScore : 0)" @disabled />
+            <input type="text" data-id="@m.MatchId"  value="@(result != null ? result.AwayScore : 0)" @disabled />
             <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
             <div class="penca-row-final">
                 <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
@@ -157,8 +157,9 @@
         $(document).ready(function () {
             $("#btnSave").click(function () {
                 var scores = "";
+                debugger;
                 $("input[type='text']").each(function () {
-                    scores += $(this).val() + "|";
+                    scores += $(this).data("id") + "!" + $(this).val() + "|";
                 });
                 $.ajax({
                     type: "POST",
@@ -234,7 +235,8 @@
                     yAxis: {
                         title: {
                             text: ''
-                        }
+                        },
+                        min: 0
                     },
                     legend: {
                         align: 'right',

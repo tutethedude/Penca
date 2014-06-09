@@ -58,12 +58,12 @@ namespace Penca.Controllers
                     ClearResultsFirstRound(user.UserId);
                     using (var db = new MatchContext())
                     {
-                        var matchId = 1;
                         for (int i = 0; i < 48 * 2; i = i + 2)
                         {
-                            var result = new Result { UserId = user.UserId, MatchId = matchId, HomeScore = GetScore(array[i]), AwayScore = GetScore(array[i + 1]) };
+                            var homeData = array[i].Split('!');
+                            var awayData = array[i+1].Split('!');
+                            var result = new Result { UserId = user.UserId, MatchId = int.Parse(homeData[0]), HomeScore = GetScore(homeData[1]), AwayScore = GetScore(awayData[1]) };
                             db.Results.Add(result);
-                            matchId++;
                         }
                         db.SaveChanges();
                     }
