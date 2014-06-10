@@ -617,12 +617,17 @@ tr.pager td {
 .penca-row .penca-row-result-wrapper {
     display: inline-block;
     margin-bottom: 10px;
+    border-top: 1px solid darkgray;
 }
 
 .penca-row .penca-row-result {
     display: inline-block;
     width: 55px;
     text-align: center;
+}
+
+.penca-row .penca-row-result .username{
+    word-break: break-all;
 }
 
 #chart, #chartAcc {

@@ -62,17 +62,20 @@
                 <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
                 <div><strong>@(result != null ? result.ComputeFirstRoundScore() + " pts." : "")</strong></div>
             </div>
-            @*
+
+            @if (!Model.FirstRoundEnabled)
+            {
                 <div class="penca-row-result-wrapper">
                     @foreach (var r in otherResults)
                     {
                         <div class="penca-row-result">
-                            <div>@r.UserName(Model.Users)</div>
+                            <div class="username">@r.UserName(Model.Users, 8)</div>
                             <div>@r.HomeScore - @r.AwayScore</div>
+                            <div>@(r.ComputeFirstRoundScore() + " pts.")</div>
                         </div>
                     }
                 </div>
-                *@
+            }
         </div>
             }
         }
@@ -106,17 +109,21 @@
                 <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
                 <div><strong>@(result != null ? result.ComputeFirstRoundScore() + " pts." : "")</strong></div>
             </div>
-            @*
+
+            @if (!Model.FirstRoundEnabled)
+            {
                 <div class="penca-row-result-wrapper">
                     @foreach (var r in otherResults)
                     {
                         <div class="penca-row-result">
-                            <div>@r.UserName(Model.Users)</div>
+                            <div class="username">@r.UserName(Model.Users, 8)</div>
                             <div>@r.HomeScore - @r.AwayScore</div>
+                            <div>@(r.ComputeFirstRoundScore() + " pts.")</div>
                         </div>
                     }
                 </div>
-                *@
+            }
+
         </div>
             }
         }
@@ -138,7 +145,7 @@
                 </td>
                 <td>@s.User.UserName
                 </td>
-                <td>@s.Points pts
+                <td><strong>@(s.Points)</strong>
                 </td>
             </tr>
             pos++;

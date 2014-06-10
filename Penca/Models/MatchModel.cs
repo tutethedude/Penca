@@ -126,9 +126,10 @@ namespace Penca.Models
         public int HomeScore { get; set; }
         public int AwayScore { get; set; }
 
-        public string UserName(IEnumerable<UserProfile> users)
+        public string UserName(IEnumerable<UserProfile> users, int chars)
         {
-            return users.FirstOrDefault(u => u.UserId == UserId).UserName;
+            var name = users.FirstOrDefault(u => u.UserId == UserId).UserName;
+            return name.Length > chars ? name.Substring(0 , chars) : name;
         }
 
         public int ComputeFirstRoundScore()
