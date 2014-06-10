@@ -42,7 +42,7 @@
     <footer>
         <div class="content-wrapper">
             <div class="float-left">
-                <p>&copy; @DateTime.Now.Year - Penca de La Galera - @DateTime.Now.ToShortDateString() @DateTime.Now.ToShortTimeString()</p>
+                <p>&copy; @DateTime.Now.Year - Penca de La Galera - @DateTime.Now.ToUniversalTime().ToShortDateString() @DateTime.Now.ToUniversalTime().ToShortTimeString() UTC</p>
             </div>
         </div>
     </footer>
