@@ -12,7 +12,7 @@ namespace Penca.Controllers
     [InitializeSimpleMembership]
     public class HomeController : Controller
     {
-        private DateTime FIRST_ROUND_LIMIT = new DateTime(2014, 6, 11, 3, 0, 0, DateTimeKind.Utc);
+        private DateTime FIRST_ROUND_LIMIT = new DateTime(2014, 6, 11, 5, 0, 0, DateTimeKind.Utc);
 
         public ActionResult Index(string orderBy)
         {
