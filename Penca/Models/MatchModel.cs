@@ -129,7 +129,7 @@ namespace Penca.Models
         public string UserName(IEnumerable<UserProfile> users, int chars)
         {
             var name = users.FirstOrDefault(u => u.UserId == UserId).UserName;
-            return name.Length > chars ? name.Substring(0 , chars) : name;
+            return name.Length > chars ? name.Substring(0, chars) : name;
         }
 
         public int ComputeFirstRoundScore()
@@ -212,31 +212,31 @@ namespace Penca.Models
         public int Points { get; set; }
         public List<int> ScoreByDate { get; set; }
         public List<int> AccumScoreByDate { get; set; }
+        public List<int> ScoreByGroup { get; set; }
 
         public string ScoreByDateJS
         {
-            get
-            {
-                var js = "";
-                foreach (var s in ScoreByDate)
-                {
-                    js += s + ",";
-                }
-                return js.Length > 0 ? js.Remove(js.Length - 1) : js;
-            }
+            get { return ToJS(ScoreByDate); }
         }
 
         public string AccumScoreByDateJS
         {
-            get
+            get { return ToJS(AccumScoreByDate); }
+        }
+
+        public string ScoreByGroupJS
+        {
+            get { return ToJS(ScoreByGroup); }
+        }
+
+        private string ToJS(List<int> list)
+        {
+            var js = "";
+            foreach (var s in list)
             {
-                var js = "";
-                foreach (var s in AccumScoreByDate)
-                {
-                    js += s + ",";
-                }
-                return js.Length > 0 ? js.Remove(js.Length - 1) : js;
+                js += s + ",";
             }
+            return js.Length > 0 ? js.Remove(js.Length - 1) : js;
         }
     }
 }

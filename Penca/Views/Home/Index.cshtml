@@ -34,6 +34,11 @@
         </hgroup>
         <div id="chart">
         </div>
+        <hgroup class="title">
+            <h1>Puntos por grupos</h1>
+        </hgroup>
+        <div id="groupsChart">
+        </div>
     }
     @if (Model.OrderBy == "group")
     {    
@@ -69,7 +74,7 @@
                     @foreach (var r in otherResults)
                     {
                         <div class="penca-row-result">
-                            <div class="username">@r.UserName(Model.Users, 8)</div>
+                            <div class="username">@r.UserName(Model.Users, 8).ToLower()</div>
                             <div>@r.HomeScore - @r.AwayScore</div>
                             <div>@(r.ComputeFirstRoundScore() + " pts.")</div>
                         </div>
@@ -116,7 +121,7 @@
                     @foreach (var r in otherResults)
                     {
                         <div class="penca-row-result">
-                            <div class="username">@r.UserName(Model.Users, 8)</div>
+                            <div class="username">@r.UserName(Model.Users, 8).ToLower()</div>
                             <div>@r.HomeScore - @r.AwayScore</div>
                             <div>@(r.ComputeFirstRoundScore() + " pts.")</div>
                         </div>
@@ -260,6 +265,46 @@
             }
 
                 $('#chartAcc').highcharts(chartOptAcc);
+
+                var chartOptGroup = {
+                    chart: {
+                        type: 'bar'
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        title: {
+                            text: ''
+                        },
+                        categories: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+                    },
+                    yAxis: {
+                        title: {
+                            text: ''
+                        },
+                        min: 0
+                    },
+                    legend: {
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        layout: 'vertical',
+                        floating: false
+                    },
+                    series: []
+                };
+
+            @foreach (var s in Model.Ranking)
+            {
+                <text>chartOptGroup.series.push({ name: '@s.User.UserName', data: [@s.ScoreByGroupJS] });</text>
+            }
+
+                $('#groupsChart').highcharts(chartOptGroup);
             });
         </script>
     }

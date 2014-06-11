@@ -118,12 +118,13 @@ namespace Penca.Controllers
 
             foreach (var u in users)
             {
-                var score = new Score { User = u, ScoreByDate = new List<int>(), AccumScoreByDate = new List<int>() };
+                var score = new Score { User = u, ScoreByDate = new List<int>(), AccumScoreByDate = new List<int>(), ScoreByGroup = new List<int>() };
                 var lastMatch = matches.Where(m => m.HomeScore >= 0).OrderBy(m => m.MatchId).LastOrDefault();
                 if (lastMatch != null)
                 {
                     var scoreDic = new SortedDictionary<DateTime, int>();
                     var accumScoreDic = new SortedDictionary<DateTime, int>();
+                    var groupDic = new SortedDictionary<string, int>();
                     var userResults = results.Where(r => r.MatchId <= lastMatch.MatchId && r.UserId == u.UserId).ToList();
                     foreach (var r in userResults)
                     {
@@ -137,16 +138,21 @@ namespace Penca.Controllers
                         else
                             scoreDic[match.MatchDate.Date] = points;
 
-                        //if (accumScoreDic.ContainsKey(match.MatchDate.Date))
-                        //    accumScoreDic[match.MatchDate.Date] += score.Points;
-                        //else
-                            accumScoreDic[match.MatchDate.Date] = score.Points;
+                        accumScoreDic[match.MatchDate.Date] = score.Points;
 
+                        if (groupDic.ContainsKey(match.Group))
+                            groupDic[match.Group] += points;
+                        else
+                            groupDic[match.Group] = points;
                     }
                     foreach (var k in scoreDic.Keys)
                     {
                         score.ScoreByDate.Add(scoreDic[k]);
                         score.AccumScoreByDate.Add(accumScoreDic[k]);
+                    }
+                    foreach (var g in groupDic.Keys)
+                    {
+                        score.ScoreByGroup.Add(groupDic[g]);
                     }
                 }
                 ranking.Add(score);

@@ -25,7 +25,7 @@ namespace Penca
             
             bundles.Add(new ScriptBundle("~/bundles/highcharts").Include(
                         "~/Scripts/highcharts.js",
-                        "~/Scripts/themes/gray.js"));
+                        "~/Scripts/themes/grid-light.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include("~/Content/site.css"));
 
