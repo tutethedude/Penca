@@ -125,7 +125,7 @@ namespace Penca.Controllers
                     var scoreDic = new SortedDictionary<DateTime, int>();
                     var accumScoreDic = new SortedDictionary<DateTime, int>();
                     var groupDic = new SortedDictionary<string, int>();
-                    var userResults = results.Where(r => r.MatchId <= lastMatch.MatchId && r.UserId == u.UserId).ToList();
+                    var userResults = results.Where(r => r.MatchId <= lastMatch.MatchId && r.UserId == u.UserId).OrderBy(r => r.MatchId).ToList();
                     foreach (var r in userResults)
                     {
                         var match = matches.Where(m => m.MatchId == r.MatchId).FirstOrDefault();
