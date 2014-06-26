@@ -66,7 +66,7 @@
                 <div><strong>@(result != null ? result.ComputeEigthRoundScore() + " pts." : "")</strong></div>
             </div>
 
-            @if (!Model.EigthRoundEnabled)
+            @if (User.Identity.IsAuthenticated && !Model.EigthRoundEnabled)
             {
                 <div class="penca-row-result-wrapper">
                     @foreach (var r in otherResults)
