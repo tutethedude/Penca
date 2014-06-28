@@ -154,10 +154,35 @@ namespace Penca.Models
             return 0;
         }
 
+        public int ComputeEigthRoundScore()
+        {
+            if (Match.HomeScore >= 0 && Match.AwayScore >= 0)
+            {
+                if (Match.HomeScore == this.HomeScore && Match.AwayScore == this.AwayScore)
+                    return EIGTH_ROUND_EXACT_SCORE;
+                else if (Match.HomeScore > Match.AwayScore && this.HomeScore > this.AwayScore && (Match.HomeScore == this.HomeScore || Match.AwayScore == this.AwayScore))
+                    return EIGTH_ROUND_PARTIAL_SCORE;
+                else if (Match.HomeScore == Match.AwayScore && this.HomeScore == this.AwayScore && (Match.HomeScore == this.HomeScore || Match.AwayScore == this.AwayScore))
+                    return EIGTH_ROUND_PARTIAL_SCORE;
+                else if (Match.AwayScore > Match.HomeScore && this.AwayScore > this.HomeScore && (Match.HomeScore == this.HomeScore || Match.AwayScore == this.AwayScore))
+                    return EIGTH_ROUND_PARTIAL_SCORE;
+                else if (Match.HomeScore > Match.AwayScore && this.HomeScore > this.AwayScore)
+                    return EIGTH_ROUND_WINNER_SCORE;
+                else if (Match.HomeScore == Match.AwayScore && this.HomeScore == this.AwayScore)
+                    return EIGTH_ROUND_WINNER_SCORE;
+                else if (Match.AwayScore > Match.HomeScore && this.AwayScore > this.HomeScore)
+                    return EIGTH_ROUND_WINNER_SCORE;
+            }
+            return 0;
+        }
 
         private const int FIRST_ROUND_EXACT_SCORE = 3;
         private const int FIRST_ROUND_PARTIAL_SCORE = 2;
         private const int FIRST_ROUND_WINNER_SCORE = 1;
+        
+        private const int EIGTH_ROUND_EXACT_SCORE = 3;
+        private const int EIGTH_ROUND_PARTIAL_SCORE = 2;
+        private const int EIGTH_ROUND_WINNER_SCORE = 1;
     }
 
     public class MainModel
@@ -168,6 +193,7 @@ namespace Penca.Models
         public IEnumerable<Score> Ranking { get; set; }
         public IEnumerable<UserProfile> Users { get; set; }
         public bool FirstRoundEnabled { get; set; }
+        public bool EigthRoundEnabled { get; set; }
         public string OrderBy { get; set; }
 
         public string CategoriesJS
@@ -193,7 +219,7 @@ namespace Penca.Models
         {
             get
             {
-                return Matches.GroupBy(m => m.MatchDate.Date);
+                return Matches.Where(m => m.MatchId <= 48).GroupBy(m => m.MatchDate.Date);
             }
         }
 
@@ -201,7 +227,15 @@ namespace Penca.Models
         {
             get
             {
-                return Matches.GroupBy(m => m.Group);
+                return Matches.Where(m => m.MatchId <= 48).GroupBy(m => m.Group);
+            }
+        }
+
+        public IEnumerable<IGrouping<DateTime, Match>> MatchesByDateEigth
+        {
+            get
+            {
+                return Matches.Where(m => m.MatchId >= 49 && m.MatchId <= 56).GroupBy(m => m.MatchDate.Date);
             }
         }
     }

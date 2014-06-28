@@ -13,6 +13,7 @@ namespace Penca.Controllers
     public class HomeController : Controller
     {
         private DateTime FIRST_ROUND_LIMIT = new DateTime(2014, 6, 11, 5, 0, 0, DateTimeKind.Utc);
+        private DateTime EIGTH_ROUND_LIMIT = new DateTime(2014, 6, 28, 5, 0, 0, DateTimeKind.Utc);
 
         public ActionResult Index(string orderBy)
         {
@@ -21,16 +22,19 @@ namespace Penca.Controllers
             var user = CurrentUser();
             var matches = new List<Match>();
             var results = new List<Result>();
+            var matchesEigth = new List<Match>();
+            var resultsEigth = new List<Result>();
             using (var db = new UsersContext())
             {
                 model.Users = db.UserProfiles.ToList();
             }
             using (var db = new MatchContext())
             {
-                matches = db.Matches.Where(m => m.MatchId <= 48).ToList();
-                results = db.Results.Where(r => r.MatchId <= 48).ToList();
+                matches = db.Matches.Where(m => m.MatchId <= 56).ToList();
+                results = db.Results.Where(r => r.MatchId <= 56).ToList();
             }
             model.FirstRoundEnabled = FirstRoundEnabled();
+            model.EigthRoundEnabled = EigthRoundEnabled();
             model.Matches = matches;
             if (user != null)
             {
@@ -140,10 +144,13 @@ namespace Penca.Controllers
 
                         accumScoreDic[match.MatchDate.Date] = score.Points;
 
-                        if (groupDic.ContainsKey(match.Group))
-                            groupDic[match.Group] += points;
-                        else
-                            groupDic[match.Group] = points;
+                        if (match.MatchId <= 48)
+                        {
+                            if (groupDic.ContainsKey(match.Group))
+                                groupDic[match.Group] += points;
+                            else
+                                groupDic[match.Group] = points;
+                        }
                     }
                     foreach (var k in scoreDic.Keys)
                     {
@@ -160,5 +167,46 @@ namespace Penca.Controllers
             return ranking.OrderByDescending(s => s.Points);
         }
 
+        [HttpPost]
+        public ActionResult SaveEigthRound(string data)
+        {
+            if (EigthRoundEnabled())
+            {
+                var user = CurrentUser();
+                var array = data.Split('|');
+                if (array.Length == (8 * 2) + 1)
+                {
+                    ClearResultsEigthRound(user.UserId);
+                    using (var db = new MatchContext())
+                    {
+                        for (int i = 0; i < 8 * 2; i = i + 2)
+                        {
+                            var homeData = array[i].Split('!');
+                            var awayData = array[i + 1].Split('!');
+                            var result = new Result { UserId = user.UserId, MatchId = int.Parse(homeData[0]), HomeScore = GetScore(homeData[1]), AwayScore = GetScore(awayData[1]) };
+                            db.Results.Add(result);
+                        }
+                        db.SaveChanges();
+                    }
+
+                }
+            }
+            return Json("OK");
+        }
+
+        private void ClearResultsEigthRound(int userId)
+        {
+            using (var db = new MatchContext())
+            {
+                foreach (var r in db.Results.Where(r => r.UserId == userId && r.MatchId >= 49 && r.MatchId <= 56))
+                    db.Results.Remove(r);
+                db.SaveChanges();
+            }
+        }
+
+        private bool EigthRoundEnabled()
+        {
+            return User.Identity.IsAuthenticated && DateTime.Now < EIGTH_ROUND_LIMIT;
+        }
     }
 }
