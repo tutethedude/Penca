@@ -14,6 +14,7 @@ namespace Penca.Controllers
     {
         private DateTime FIRST_ROUND_LIMIT = new DateTime(2014, 6, 11, 5, 0, 0, DateTimeKind.Utc);
         private DateTime EIGTH_ROUND_LIMIT = new DateTime(2014, 6, 28, 5, 0, 0, DateTimeKind.Utc);
+        private DateTime QUARTER_ROUND_LIMIT = new DateTime(2014, 7, 4, 8, 0, 0, DateTimeKind.Utc);
 
         public ActionResult Index(string orderBy)
         {
@@ -30,11 +31,12 @@ namespace Penca.Controllers
             }
             using (var db = new MatchContext())
             {
-                matches = db.Matches.Where(m => m.MatchId <= 56).ToList();
-                results = db.Results.Where(r => r.MatchId <= 56).ToList();
+                matches = db.Matches.Where(m => m.MatchId <= 60).ToList();
+                results = db.Results.Where(r => r.MatchId <= 60).ToList();
             }
             model.FirstRoundEnabled = FirstRoundEnabled();
             model.EigthRoundEnabled = EigthRoundEnabled();
+            model.QuarterRoundEnabled = QuarterRoundEnabled();
             model.Matches = matches;
             if (user != null)
             {
@@ -134,7 +136,7 @@ namespace Penca.Controllers
                     {
                         var match = matches.Where(m => m.MatchId == r.MatchId).FirstOrDefault();
                         r.Match = match;
-                        var points = r.ComputeFirstRoundScore();
+                        var points = r.ComputeScore();
                         score.Points += points;
 
                         if (scoreDic.ContainsKey(match.MatchDate.Date))
@@ -207,6 +209,48 @@ namespace Penca.Controllers
         private bool EigthRoundEnabled()
         {
             return User.Identity.IsAuthenticated && DateTime.Now < EIGTH_ROUND_LIMIT;
+        }
+
+        [HttpPost]
+        public ActionResult SaveQuarterRound(string data)
+        {
+            if (QuarterRoundEnabled())
+            {
+                var user = CurrentUser();
+                var array = data.Split('|');
+                if (array.Length == (4 * 2) + 1)
+                {
+                    ClearResultsQuarterRound(user.UserId);
+                    using (var db = new MatchContext())
+                    {
+                        for (int i = 0; i < 4 * 2; i = i + 2)
+                        {
+                            var homeData = array[i].Split('!');
+                            var awayData = array[i + 1].Split('!');
+                            var result = new Result { UserId = user.UserId, MatchId = int.Parse(homeData[0]), HomeScore = GetScore(homeData[1]), AwayScore = GetScore(awayData[1]) };
+                            db.Results.Add(result);
+                        }
+                        db.SaveChanges();
+                    }
+
+                }
+            }
+            return Json("OK");
+        }
+
+        private void ClearResultsQuarterRound(int userId)
+        {
+            using (var db = new MatchContext())
+            {
+                foreach (var r in db.Results.Where(r => r.UserId == userId && r.MatchId >= 57 && r.MatchId <= 60))
+                    db.Results.Remove(r);
+                db.SaveChanges();
+            }
+        }
+
+        private bool QuarterRoundEnabled()
+        {
+            return User.Identity.IsAuthenticated && DateTime.Now < QUARTER_ROUND_LIMIT;
         }
     }
 }

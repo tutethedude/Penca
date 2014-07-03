@@ -3,6 +3,7 @@
     ViewBag.Title = "Pronósticos";
     var disabled = Model.FirstRoundEnabled ? "" : "disabled";
     var disabledEigth = Model.EigthRoundEnabled ? "" : "disabled";
+    var disabledQuarter = Model.QuarterRoundEnabled ? "" : "disabled";
 }
 @*
 @section featured {
@@ -43,6 +44,54 @@
     }
 
     <hgroup class="title">
+        <h1>Pronóstico cuartos de final</h1>
+    </hgroup>
+    @foreach (var g in Model.MatchesByDateQuarter)
+    {
+        <h3>@g.Key.ToString("dd MMM").ToUpper()</h3>
+        foreach (var m in g)
+        {
+            var result = Model.MyResults.FirstOrDefault(r => r.MatchId == m.MatchId);
+            var otherResults = Model.OtherResults.Where(r => r.MatchId == m.MatchId).OrderBy(r => r.UserId);
+        <div class="penca-row">
+            <div class="penca-row-date">
+                <div>@m.MatchDate.ToString("HH:mm").ToUpper()</div>
+            </div>
+            <img height="28" src="~/Content/images/@m.HomeFlag()" title="@m.HomeTeam" />
+            <input type="text" data-id="@m.MatchId"  value="@(result != null ? result.HomeScore : 0)" @disabledQuarter />
+            <span>&nbsp;</span>
+            <input type="text" data-id="@m.MatchId"  value="@(result != null ? result.AwayScore : 0)" @disabledQuarter />
+            <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
+            <div class="penca-row-final">
+                <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
+                <div><strong>@(result != null ? result.ComputeScore() + " pts." : "")</strong></div>
+            </div>
+
+            @if (User.Identity.IsAuthenticated && !Model.QuarterRoundEnabled)
+            {
+                <div class="penca-row-result-wrapper">
+                    @foreach (var r in otherResults)
+                    {
+                        <div class="penca-row-result">
+                            <div class="username">@r.UserName(Model.Users, 8).ToLower()</div>
+                            <div>@r.HomeScore - @r.AwayScore</div>
+                            <div>@(r.ComputeScore() + " pts.")</div>
+                        </div>
+                    }
+                </div>
+            }
+
+        </div>
+        }
+    }
+    
+    <button id="btnSave" @disabledQuarter>GUARDAR</button>
+    @if (!Request.IsAuthenticated)
+    {
+        <span>Para cargar resultados hay que @Html.ActionLink("registrarse", "Register", "Account") o @Html.ActionLink("iniciar sesión", "Login", "Account"), no seas mamarera!</span>
+    }
+
+    <hgroup class="title">
         <h1>Pronóstico octavos de final</h1>
     </hgroup>
     @foreach (var g in Model.MatchesByDateEigth)
@@ -63,7 +112,7 @@
             <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
             <div class="penca-row-final">
                 <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
-                <div><strong>@(result != null ? result.ComputeEigthRoundScore() + " pts." : "")</strong></div>
+                <div><strong>@(result != null ? result.ComputeScore() + " pts." : "")</strong></div>
             </div>
 
             @if (User.Identity.IsAuthenticated && !Model.EigthRoundEnabled)
@@ -74,7 +123,7 @@
                         <div class="penca-row-result">
                             <div class="username">@r.UserName(Model.Users, 8).ToLower()</div>
                             <div>@r.HomeScore - @r.AwayScore</div>
-                            <div>@(r.ComputeEigthRoundScore() + " pts.")</div>
+                            <div>@(r.ComputeScore() + " pts.")</div>
                         </div>
                     }
                 </div>
@@ -82,12 +131,6 @@
 
         </div>
         }
-    }
-    
-    <button id="btnSave" @disabledEigth>GUARDAR</button>
-    @if (!Request.IsAuthenticated)
-    {
-        <span>Para cargar resultados hay que @Html.ActionLink("registrarse", "Register", "Account") o @Html.ActionLink("iniciar sesión", "Login", "Account"), no seas mamarera!</span>
     }
 
     @if (Model.OrderBy == "group")
@@ -115,7 +158,7 @@
             <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
             <div class="penca-row-final">
                 <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
-                <div><strong>@(result != null ? result.ComputeFirstRoundScore() + " pts." : "")</strong></div>
+                <div><strong>@(result != null ? result.ComputeScore() + " pts." : "")</strong></div>
             </div>
 
             @if (!Model.FirstRoundEnabled)
@@ -126,7 +169,7 @@
                         <div class="penca-row-result">
                             <div class="username">@r.UserName(Model.Users, 8).ToLower()</div>
                             <div>@r.HomeScore - @r.AwayScore</div>
-                            <div>@(r.ComputeFirstRoundScore() + " pts.")</div>
+                            <div>@(r.ComputeScore() + " pts.")</div>
                         </div>
                     }
                 </div>
@@ -162,7 +205,7 @@
             <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
             <div class="penca-row-final">
                 <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
-                <div><strong>@(result != null ? result.ComputeFirstRoundScore() + " pts." : "")</strong></div>
+                <div><strong>@(result != null ? result.ComputeScore() + " pts." : "")</strong></div>
             </div>
 
             @if (!Model.FirstRoundEnabled)
@@ -173,7 +216,7 @@
                         <div class="penca-row-result">
                             <div class="username">@r.UserName(Model.Users, 8).ToLower()</div>
                             <div>@r.HomeScore - @r.AwayScore</div>
-                            <div>@(r.ComputeFirstRoundScore() + " pts.")</div>
+                            <div>@(r.ComputeScore() + " pts.")</div>
                         </div>
                     }
                 </div>
@@ -219,7 +262,7 @@
                 });
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("SaveEigthRound")" + "?data=" + scores,
+                    url: "@Url.Action("SaveQuarterRound")" + "?data=" + scores,
                     success: function (data) {
                         if (data == "OK") {
                             alert("Los cambios se guardaron correctamente");
