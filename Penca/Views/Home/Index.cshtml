@@ -4,6 +4,7 @@
     var disabled = Model.FirstRoundEnabled ? "" : "disabled";
     var disabledEigth = Model.EigthRoundEnabled ? "" : "disabled";
     var disabledQuarter = Model.QuarterRoundEnabled ? "" : "disabled";
+    var disabledSemi = Model.SemiRoundEnabled ? "" : "disabled";
 }
 @*
 @section featured {
@@ -41,6 +42,54 @@
         </hgroup>
         <div id="groupsChart">
         </div>
+    }
+
+    <hgroup class="title">
+        <h1>Pronóstico semifinal</h1>
+    </hgroup>
+    @foreach (var g in Model.MatchesByDateSemi)
+    {
+        <h3>@g.Key.ToString("dd MMM").ToUpper()</h3>
+        foreach (var m in g)
+        {
+            var result = Model.MyResults.FirstOrDefault(r => r.MatchId == m.MatchId);
+            var otherResults = Model.OtherResults.Where(r => r.MatchId == m.MatchId).OrderBy(r => r.UserId);
+        <div class="penca-row">
+            <div class="penca-row-date">
+                <div>@m.MatchDate.ToString("HH:mm").ToUpper()</div>
+            </div>
+            <img height="28" src="~/Content/images/@m.HomeFlag()" title="@m.HomeTeam" />
+            <input type="text" data-id="@m.MatchId"  value="@(result != null ? result.HomeScore : 0)" @disabledSemi />
+            <span>&nbsp;</span>
+            <input type="text" data-id="@m.MatchId"  value="@(result != null ? result.AwayScore : 0)" @disabledSemi />
+            <img height="28" src="~/Content/images/@m.AwayFlag()" title="@m.AwayTeam" />
+            <div class="penca-row-final">
+                <div>@(m.HomeScore < 0 ? "Pendiente" : "Final: " + m.HomeScore.ToString() + " - " + m.AwayScore)</div>
+                <div><strong>@(result != null ? result.ComputeScore() + " pts." : "")</strong></div>
+            </div>
+
+            @if (User.Identity.IsAuthenticated && !Model.SemiRoundEnabled)
+            {
+                <div class="penca-row-result-wrapper">
+                    @foreach (var r in otherResults)
+                    {
+                        <div class="penca-row-result">
+                            <div class="username">@r.UserName(Model.Users, 8).ToLower()</div>
+                            <div>@r.HomeScore - @r.AwayScore</div>
+                            <div>@(r.ComputeScore() + " pts.")</div>
+                        </div>
+                    }
+                </div>
+            }
+
+        </div>
+        }
+    }
+    
+    <button id="btnSave" @disabledSemi>GUARDAR</button>
+    @if (!Request.IsAuthenticated)
+    {
+        <span>Para cargar resultados hay que @Html.ActionLink("registrarse", "Register", "Account") o @Html.ActionLink("iniciar sesión", "Login", "Account"), no seas mamarera!</span>
     }
 
     <hgroup class="title">
@@ -83,12 +132,6 @@
 
         </div>
         }
-    }
-    
-    <button id="btnSave" @disabledQuarter>GUARDAR</button>
-    @if (!Request.IsAuthenticated)
-    {
-        <span>Para cargar resultados hay que @Html.ActionLink("registrarse", "Register", "Account") o @Html.ActionLink("iniciar sesión", "Login", "Account"), no seas mamarera!</span>
     }
 
     <hgroup class="title">
@@ -262,7 +305,7 @@
                 });
                 $.ajax({
                     type: "POST",
-                    url: "@Url.Action("SaveQuarterRound")" + "?data=" + scores,
+                    url: "@Url.Action("SaveSemiRound")" + "?data=" + scores,
                     success: function (data) {
                         if (data == "OK") {
                             alert("Los cambios se guardaron correctamente");
