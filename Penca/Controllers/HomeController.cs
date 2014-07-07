@@ -262,12 +262,12 @@ namespace Penca.Controllers
             {
                 var user = CurrentUser();
                 var array = data.Split('|');
-                if (array.Length == (4 * 2) + 1)
+                if (array.Length == (2 * 2) + 1)
                 {
                     ClearResultsSemiRound(user.UserId);
                     using (var db = new MatchContext())
                     {
-                        for (int i = 0; i < 4 * 2; i = i + 2)
+                        for (int i = 0; i < 2 * 2; i = i + 2)
                         {
                             var homeData = array[i].Split('!');
                             var awayData = array[i + 1].Split('!');
