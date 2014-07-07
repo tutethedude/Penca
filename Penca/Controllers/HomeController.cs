@@ -32,8 +32,8 @@ namespace Penca.Controllers
             }
             using (var db = new MatchContext())
             {
-                matches = db.Matches.Where(m => m.MatchId <= 60).ToList();
-                results = db.Results.Where(r => r.MatchId <= 60).ToList();
+                matches = db.Matches.Where(m => m.MatchId <= 62).ToList();
+                results = db.Results.Where(r => r.MatchId <= 62).ToList();
             }
             model.FirstRoundEnabled = FirstRoundEnabled();
             model.EigthRoundEnabled = EigthRoundEnabled();
