@@ -170,6 +170,7 @@ namespace Penca.Models
         public bool EigthRoundEnabled { get; set; }
         public bool QuarterRoundEnabled { get; set; }
         public bool SemiRoundEnabled { get; set; }
+        public bool FinalRoundEnabled { get; set; }
         public string OrderBy { get; set; }
 
         public string CategoriesJS
@@ -228,6 +229,14 @@ namespace Penca.Models
             get
             {
                 return Matches.Where(m => m.MatchId >= 61 && m.MatchId <= 62).GroupBy(m => m.MatchDate.Date);
+            }
+        }
+
+        public IEnumerable<IGrouping<DateTime, Match>> MatchesByDateFinal
+        {
+            get
+            {
+                return Matches.Where(m => m.MatchId >= 63 && m.MatchId <= 64).GroupBy(m => m.MatchDate.Date);
             }
         }
     }

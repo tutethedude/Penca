@@ -16,6 +16,7 @@ namespace Penca.Controllers
         private DateTime EIGTH_ROUND_LIMIT = new DateTime(2014, 6, 28, 5, 0, 0, DateTimeKind.Utc);
         private DateTime QUARTER_ROUND_LIMIT = new DateTime(2014, 7, 4, 8, 0, 0, DateTimeKind.Utc);
         private DateTime SEMI_ROUND_LIMIT = new DateTime(2014, 7, 8, 8, 0, 0, DateTimeKind.Utc);
+        private DateTime FINAL_ROUND_LIMIT = new DateTime(2014, 7, 12, 8, 0, 0, DateTimeKind.Utc);
 
         public ActionResult Index(string orderBy)
         {
@@ -39,6 +40,7 @@ namespace Penca.Controllers
             model.EigthRoundEnabled = EigthRoundEnabled();
             model.QuarterRoundEnabled = QuarterRoundEnabled();
             model.SemiRoundEnabled = SemiRoundEnabled();
+            model.FinalRoundEnabled = FinalRoundEnabled();
             model.Matches = matches;
             if (user != null)
             {
@@ -295,6 +297,48 @@ namespace Penca.Controllers
         private bool SemiRoundEnabled()
         {
             return User.Identity.IsAuthenticated && DateTime.Now < SEMI_ROUND_LIMIT;
+        }
+
+        [HttpPost]
+        public ActionResult SaveFinalRound(string data)
+        {
+            if (FinalRoundEnabled())
+            {
+                var user = CurrentUser();
+                var array = data.Split('|');
+                if (array.Length == (2 * 2) + 1)
+                {
+                    ClearResultsFinalRound(user.UserId);
+                    using (var db = new MatchContext())
+                    {
+                        for (int i = 0; i < 2 * 2; i = i + 2)
+                        {
+                            var homeData = array[i].Split('!');
+                            var awayData = array[i + 1].Split('!');
+                            var result = new Result { UserId = user.UserId, MatchId = int.Parse(homeData[0]), HomeScore = GetScore(homeData[1]), AwayScore = GetScore(awayData[1]) };
+                            db.Results.Add(result);
+                        }
+                        db.SaveChanges();
+                    }
+
+                }
+            }
+            return Json("OK");
+        }
+
+        private void ClearResultsFinalRound(int userId)
+        {
+            using (var db = new MatchContext())
+            {
+                foreach (var r in db.Results.Where(r => r.UserId == userId && r.MatchId >= 63 && r.MatchId <= 64))
+                    db.Results.Remove(r);
+                db.SaveChanges();
+            }
+        }
+
+        private bool FinalRoundEnabled()
+        {
+            return User.Identity.IsAuthenticated && DateTime.Now < FINAL_ROUND_LIMIT;
         }
     }
 }
